@@ -1,19 +1,14 @@
 import styled from "styled-components";
-import Sidebar from "../components/layouts/Sidebar";
-import Header from "../components/layouts/Header";
-import { useState } from "react";
+import Footer from "../components/layouts/Footer";
 
 export default function MainLayout({ children }) {
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-
     return (
-        <Wrapper>
-            <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <Main>
-                <Header onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
-                <Content>{children}</Content>
-            </Main>
-        </Wrapper>
+      <Wrapper>
+        <Main>
+          <Footer/>
+          <Content>{children}</Content>
+        </Main>
+      </Wrapper>
     );
 }
 

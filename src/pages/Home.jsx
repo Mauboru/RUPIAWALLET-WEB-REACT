@@ -22,9 +22,8 @@ export default function Home() {
   return (
     <MainLayout>
       <Styled.ContentWrapper>
-        <Styled.MainTitle>Bem-vindo, {user ? user.name : 'Visitante'}!</Styled.MainTitle>
-        <Styled.InfoText>Este é um ambiente de demonstração.</Styled.InfoText>
-        <Styled.InfoText>Para solicitar acesso completo, entre em contato com o administrador.</Styled.InfoText>
+        <Styled.MainTitle>Bem-vindo, ao Rupia Wallet!</Styled.MainTitle>
+        <Styled.InfoText>Aqui você pode gerenciar suas finanças com qualidade e confiança!.</Styled.InfoText>
       </Styled.ContentWrapper>
     </MainLayout>
   );
