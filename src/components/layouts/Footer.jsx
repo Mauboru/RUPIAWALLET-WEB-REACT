@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaSearch, FaUser } from "react-icons/fa";
+import { FaHome, FaSearch, FaPlusCircle, FaChartPie, FaUser } from "react-icons/fa";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -10,9 +10,14 @@ export default function Footer() {
 
   return (
     <Styled.FooterContainer>
-      <Styled.FooterButton onClick={() => navigate("/inserir")} active={isActive("/inserir")}>
+      <Styled.FooterButton onClick={() => navigate("/buscar")} active={isActive("/buscar")}>
         <FaSearch />
         <Styled.Label>Buscar</Styled.Label>
+      </Styled.FooterButton>
+
+      <Styled.FooterButton onClick={() => navigate("/inserir")} active={isActive("/inserir")}>
+        <FaPlusCircle />
+        <Styled.Label>Inserir</Styled.Label>
       </Styled.FooterButton>
 
       <Styled.FooterButton onClick={() => navigate("/")} active={isActive("/")}>
@@ -21,6 +26,11 @@ export default function Footer() {
       </Styled.FooterButton>
 
       <Styled.FooterButton onClick={() => navigate("/dashboards")} active={isActive("/dashboards")}>
+        <FaChartPie />
+        <Styled.Label>Gráficos</Styled.Label>
+      </Styled.FooterButton>
+
+      <Styled.FooterButton onClick={() => navigate("/perfil")} active={isActive("/perfil")}>
         <FaUser />
         <Styled.Label>Perfil</Styled.Label>
       </Styled.FooterButton>
