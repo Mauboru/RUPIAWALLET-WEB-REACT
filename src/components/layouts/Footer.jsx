@@ -43,7 +43,7 @@ const Styled = {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 64px;
+    height: 84px;
     background-color: #1b1b1b;
     display: flex;
     justify-content: space-around;

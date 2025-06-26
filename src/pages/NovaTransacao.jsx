@@ -7,18 +7,17 @@ import { CustomModal } from "../components";
 
 export default function NovaTransacao() {
   const [data, setData] = useState({
-      tipo: "gasto",
-      descricao: "",
-      valor: "",
-      data: new Date().toISOString().split("T")[0],
-      categoriaId: "",
-      formaPagamento: "Dinheiro",
-      recorrente: false,
-      observacoes: ""
+    tipo: "",
+    categoriaId: "",
+    descricao: "",
+    valor: "",
+    data: new Date().toISOString().split("T")[0],
+    formaPagamento: "",
   });
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState([]);
   const [modal, setModal] = useState({ show: false, type: "info", message: "" });
+  const [rawValor, setRawValor] = useState("");
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -49,12 +48,14 @@ export default function NovaTransacao() {
     setLoading(true);
   
     try {
-      const response = await newTransaction(data);
+      const valorNumerico = parseFloat(rawValor) / 100;
+      const response = await newTransaction({ ...data, valor: valorNumerico });
       setModal({
         show: true,
         type: "success",
         message: response.data.message,
       });
+      clearFields();
     } catch (error) {
       const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor.";
       setModal({
@@ -66,85 +67,97 @@ export default function NovaTransacao() {
       setLoading(false);
     }
   };
+
+  const clearFields = () => {
+    setData({
+      tipo: "",
+      categoriaId: "",
+      descricao: "",
+      valor: "",
+      data: new Date().toISOString().split("T")[0], 
+      formaPagamento: "",
+    });
+    setRawValor("");
+  };
+
+  const handleCurrencyChange = (e) => {
+    let onlyDigits = e.target.value.replace(/\D/g, "");
+    
+    if (onlyDigits === "") {
+      setRawValor("");
+      setData(prev => ({ ...prev, valor: "" }));
+      return;
+    }
   
+    onlyDigits = onlyDigits.padStart(2, "0");
+    
+    const cents = onlyDigits.slice(-2);
+    const reais = onlyDigits.slice(0, -2) || "0"; 
+    const formatted = Number(reais).toLocaleString('pt-BR') + "," + cents;
+    
+    setRawValor(onlyDigits);
+    setData(prev => ({ ...prev, valor: formatted }));
+  };
 
   return (
     <MainLayout>
-      <Styled.ContentWrapper>
-        <Styled.Title>Nova Transação</Styled.Title>
-        <Styled.Form onSubmit={handleSubmit}>
-          <Styled.Select name="tipo" value={data.tipo} onChange={handleChange}>
-            <option value="gasto">Gasto</option>
-            <option value="ganho">Ganho</option>
-          </Styled.Select>
+      <Styled.Title>Nova Transação</Styled.Title>
+      <Styled.Form onSubmit={handleSubmit}>
 
-          <Styled.Input
-            name="descricao"
-            placeholder="Descrição"
-            value={data.descricao}
-            onChange={handleChange}
-            required
-          />
-
-          <Styled.Input
-            name="valor"
-            type="number"
-            step="0.01"
-            placeholder="Valor"
-            value={data.valor}
-            onChange={handleChange}
-            required
-          />
-
-          <Styled.Input
-            name="data"
-            type="date"
-            value={data.data}
-            onChange={handleChange}
-            required
-          />
-
-          <Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
-            <option value="">Selecione uma categoria</option>
-            {categorias.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.nome}</option>
-            ))}
-          </Styled.Select>
-
-          <Styled.Input
-            name="formaPagamento"
-            placeholder="Forma de Pagamento"
-            value={data.formaPagamento}
-            onChange={handleChange}
-            required
-          />
-
-          <Styled.CheckboxLabel>
-            <input
-            type="checkbox"
-            name="recorrente"
-            checked={data.recorrente}
-            onChange={handleChange}
-            />
-            Recorrente
-          </Styled.CheckboxLabel>
-
-          <Styled.Textarea
-            name="observacoes"
-            placeholder="Observações"
-            value={data.observacoes}
-            onChange={handleChange}
-          />
-
-          <Styled.Button type="submit">Salvar</Styled.Button>
-        </Styled.Form>
-        <CustomModal
-          show={modal.show}
-          type={modal.type}
-          message={modal.message}
-          onHide={() => setModal({ ...modal, show: false })}
+        <Styled.Input
+          name="data"
+          type="date"
+          value={data.data}
+          onChange={handleChange}
+          required
         />
-      </Styled.ContentWrapper>
+
+        <Styled.Select name="tipo" value={data.tipo} onChange={handleChange} required>
+          <option value="" disabled>Selecione o tipo</option>
+          <option value="ENTRADA">ENTRADA</option>
+          <option value="SAIDA">SAÍDA</option>
+        </Styled.Select>
+
+        <Styled.Select name="formaPagamento" value={data.formaPagamento} onChange={handleChange} required>
+          <option value="" disabled>Selecione a forma de pagamento</option>
+          <option value="DINHEIRO">DINHEIRO</option>
+          <option value="PIX">PIX</option>
+          <option value="CREDITO">CRÉDITO</option>
+          <option value="DEBITO">DÉBITO</option>
+        </Styled.Select>
+
+        <Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
+          <option value="">Selecione uma categoria</option>
+          {categorias.map((cat) => (
+          <option key={cat.id} value={cat.id}>{cat.nome}</option>
+          ))}
+        </Styled.Select>
+
+        <Styled.Input
+          name="descricao"
+          placeholder="Descrição"
+          value={data.descricao}
+          onChange={handleChange}
+          required
+        />
+
+        <Styled.Input
+          name="valor"
+          type="text"
+          placeholder="Valor"
+          value={data.valor}
+          onChange={handleCurrencyChange}
+          required
+        />
+
+        <Styled.Button type="submit">Salvar</Styled.Button>
+      </Styled.Form>
+      <CustomModal
+        show={modal.show}
+        type={modal.type}
+        message={modal.message}
+        onHide={() => setModal({ ...modal, show: false })}
+      />
     </MainLayout>
   );
 }
