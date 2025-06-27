@@ -10,27 +10,27 @@ export default function Footer() {
 
   return (
     <Styled.FooterContainer>
-      <Styled.FooterButton onClick={() => navigate("/buscar")} active={isActive("/buscar")}>
+      <Styled.FooterButton onClick={() => navigate("/buscar")} $active={isActive("/buscar")}>
         <FaSearch />
         <Styled.Label>Buscar</Styled.Label>
       </Styled.FooterButton>
 
-      <Styled.FooterButton onClick={() => navigate("/inserir")} active={isActive("/inserir")}>
+      <Styled.FooterButton onClick={() => navigate("/inserir")} $active={isActive("/inserir")}>
         <FaPlusCircle />
         <Styled.Label>Inserir</Styled.Label>
       </Styled.FooterButton>
 
-      <Styled.FooterButton onClick={() => navigate("/")} active={isActive("/")}>
+      <Styled.FooterButton onClick={() => navigate("/")} $active={isActive("/")}>
         <FaHome />
         <Styled.Label>Home</Styled.Label>
       </Styled.FooterButton>
 
-      <Styled.FooterButton onClick={() => navigate("/dashboards")} active={isActive("/dashboards")}>
+      <Styled.FooterButton onClick={() => navigate("/dashboards")} $active={isActive("/dashboards")}>
         <FaChartPie />
         <Styled.Label>Gráficos</Styled.Label>
       </Styled.FooterButton>
 
-      <Styled.FooterButton onClick={() => navigate("/perfil")} active={isActive("/perfil")}>
+      <Styled.FooterButton onClick={() => navigate("/perfil")} $active={isActive("/perfil")}>
         <FaUser />
         <Styled.Label>Perfil</Styled.Label>
       </Styled.FooterButton>
@@ -55,8 +55,8 @@ const Styled = {
   `,
 
   FooterButton: styled.button`
-    background: ${({ active }) =>
-      active ? "rgba(255, 255, 255, 0.08)" : "transparent"};
+    background: ${({ $active }) =>
+      $active ? "rgba(255, 255, 255, 0.08)" : "transparent"};
     border: none;
     color: white;
     display: flex;
@@ -66,9 +66,9 @@ const Styled = {
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 12px;
-    backdrop-filter: ${({ active }) => (active ? "blur(6px)" : "none")};
-    box-shadow: ${({ active }) =>
-      active ? "0 2px 8px rgba(0,0,0,0.4)" : "none"};
+    backdrop-filter: ${({ $active }) => ($active ? "blur(6px)" : "none")};
+    box-shadow: ${({ $active }) =>
+      $active ? "0 2px 8px rgba(0,0,0,0.4)" : "none"};
     transition: all 0.2s ease-in-out;
   `,
 
