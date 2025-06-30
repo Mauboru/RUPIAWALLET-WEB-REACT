@@ -1,117 +1,81 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import styled from "styled-components";
-import { getTransactions } from '../services/transacao';
+import { getTransactionsByMonth } from '../services/transacao';
 import { getCategory } from '../services/category';
-import { format, subMonths, parseISO, addMonths } from 'date-fns';
 
 export default function Dashboards() {
-  const [transacoes, setTransacoes] = useState([]);
-  const [periodo, setPeriodo] = useState('1'); 
+  const [mesSelecionado, setMesSelecionado] = useState(() => String(new Date().getMonth() + 1));
+  const [totalGanho, setTotalGanho] = useState(0);
+  const [totalGasto, setTotalGasto] = useState(0);
+  const [totalCredito, setTotalCredito] = useState(0);
+  const [totalPorCategoria, setTotalPorCategoria] = useState({});
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    const fetchTransacoes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getTransactions();
-        setTransacoes(response.data);
+        const [transRes, catRes] = await Promise.all([
+          getTransactionsByMonth(Number(mesSelecionado)),
+          getCategory()
+        ]);
+
+        const transacoes = transRes.data;
+        const categorias = catRes.data;
+        setCategories(categorias);
+  
+        let ganho = 0;
+        let gasto = 0;
+        let credito = 0;
+
+        const porCategoria = {};
+  
+        transacoes.forEach((transacao) => {
+          const valor = parseFloat(transacao.valor);
+          if (transacao.tipo === "ENTRADA") {
+            ganho += valor;
+          } else if (transacao.tipo === "SAIDA") {
+            gasto += valor;
+            if (transacao.formaPagamento === "CREDITO") {
+              credito += valor;
+            }
+        
+            const categoriaId = transacao.categoriaId;
+            porCategoria[categoriaId] = (porCategoria[categoriaId] || 0) + valor;
+          }
+        });
+  
+        setTotalGanho(ganho);
+        setTotalGasto(gasto);
+        setTotalCredito(credito);
+        setTotalPorCategoria(porCategoria);
       } catch (error) {
-        console.error("Erro ao carregar transações:", error);
+        console.error("Erro ao carregar dados:", error);
       }
     };
-
-      const fetchCategories = async () => {
-        try {
-          const response = await getCategory();
-          setCategories(response.data);
-        } catch (error) {
-          console.error("Erro ao carregar categorias:", error);
-        }
-    };
-
-      fetchTransacoes();
-      fetchCategories();
-  }, []);
-
-  const filtrarPorPeriodo = (tx) => {
-    const mesesAtras = parseInt(periodo);
-    const dataLimite = subMonths(new Date(), mesesAtras);
-    return tx.data ? parseISO(tx.data) >= dataLimite : false;
-  };
-
-  const processarDados = () => {
-    const totalMensal = {};
-    const totalPorFormaPagamento = {};
-    const faturaCredito = {};
-    const totalPorCategoria = { entrada: {}, saida: {} };
   
-    let totalGasto = 0;
-    let totalGanho = 0;
-    let totalCredito = 0;
-  
-    transacoes.filter(filtrarPorPeriodo).forEach(tx => {
-      const dataTx = tx.data ? parseISO(tx.data) : new Date();
-      const mes = format(dataTx, 'yyyy-MM');
-      const dia = dataTx.getDate();
-  
-      if (!totalMensal[mes]) totalMensal[mes] = { ganho: 0, gasto: 0 };
-  
-      if (tx.formaPagamento === 'CREDITO') {
-        totalCredito += Number(tx.valor);
-        const mesFatura = dia <= 12 ? mes : format(addMonths(dataTx, 1), 'yyyy-MM');
-        faturaCredito[mesFatura] = (faturaCredito[mesFatura] || 0) + Number(tx.valor);
-      }
-  
-      let categoriaNome = 'Outros';
-      const cat = categories.find(c => c.id === tx.categoriaId);
-      if (cat) categoriaNome = cat.nome;
-
-  
-      if (tx.tipo === 'SAIDA') {
-        totalGasto += Number(tx.valor);
-        totalMensal[mes].gasto += Number(tx.valor);
-        totalPorFormaPagamento[tx.formaPagamento] = (totalPorFormaPagamento[tx.formaPagamento] || 0) + Number(tx.valor);
-        totalPorCategoria.saida[categoriaNome] = (totalPorCategoria.saida[categoriaNome] || 0) + Number(tx.valor);
-      } else {
-        totalGanho += Number(tx.valor);
-        totalMensal[mes].ganho += Number(tx.valor);
-        totalPorCategoria.entrada[categoriaNome] = (totalPorCategoria.entrada[categoriaNome] || 0) + Number(tx.valor);
-      }
-    });
-  
-    return {
-      totalMensal,
-      totalPorFormaPagamento,
-      faturaCredito,
-      totalPorCategoria,
-      totalGasto,
-      totalGanho,
-      totalCredito
-    };
-  };  
-
-  const {
-    totalPorCategoria,
-    totalMensal,
-    totalPorFormaPagamento,
-    faturaCredito,
-    totalGasto,
-    totalGanho,
-    totalCredito
-  } = processarDados();
+    fetchData();
+  }, [mesSelecionado]);
 
   return (
     <MainLayout>
       <Styled.Header>
         <Styled.Title>Dashboard Financeiro</Styled.Title>
         <Styled.PeriodoSelector>
-          <label>Período:</label>
-          <select value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
-            <option value="1">Último mês</option>
-            <option value="3">3 meses</option>
-            <option value="6">6 meses</option>
-            <option value="12">1 ano</option>
-            <option value="0">Todos</option>
+        <label>Mês:</label>
+          <select value={mesSelecionado} onChange={(e) => setMesSelecionado(e.target.value)}>
+            <option value="1">Janeiro</option>
+            <option value="2">Fevereiro</option>
+            <option value="3">Março</option>
+            <option value="4">Abril</option>
+            <option value="5">Maio</option>
+            <option value="6">Junho</option>
+            <option value="7">Julho</option>
+            <option value="8">Agosto</option>
+            <option value="9">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
           </select>
         </Styled.PeriodoSelector>
       </Styled.Header>
@@ -142,21 +106,14 @@ export default function Dashboards() {
       {/* Soma por Categoria */}
       <Styled.Title>Soma por Categoria</Styled.Title>
       <Styled.ResumoContainer>
-        {Object.entries(totalPorCategoria.saida).map(([nome, valor]) => {
-          const categoria = categories.find(cat => cat.nome === nome);
-          const cor = categoria?.cor || '#bdc3c7';
-          const iconeUrl = categoria?.icone || null;
+        {Object.entries(totalPorCategoria).map(([categoriaId, valor]) => {
+          const categoria = categories.find(cat => cat.id === Number(categoriaId));
+          if (!categoria) return null;
 
           return (
-            <Styled.CategoriaCard key={nome} cor={cor}>
-              {iconeUrl && (
-                <img
-                  src={iconeUrl}
-                  alt={nome}
-                  style={{ width: 32, height: 32, marginBottom: '0.5rem' }}
-                />
-              )}
-              <h3>{nome}</h3>
+            <Styled.CategoriaCard key={categoriaId} cor={categoria.cor}>
+              {categoria.icone && <img src={categoria.icone} alt={categoria.nome} style={{ width: 32, height: 32, marginBottom: '0.5rem' }} />}
+              <h3>{categoria.nome}</h3>
               <p>R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
             </Styled.CategoriaCard>
           );
