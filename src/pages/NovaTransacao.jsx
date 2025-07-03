@@ -13,7 +13,7 @@ export default function NovaTransacao() {
     valor: "",
     data: new Date().toISOString().split("T")[0],
     formaPagamento: "",
-  });
+  }); 
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState([]);
   const [modal, setModal] = useState({ show: false, type: "info", message: "" });

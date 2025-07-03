@@ -15,11 +15,16 @@ export default function Dashboards() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const now = new Date();
+        const anoAtual = now.getFullYear();
+        const mesFormatado = mesSelecionado.padStart(2, '0');
+        const periodo = `${anoAtual}-${mesFormatado}`;
+  
         const [transRes, catRes] = await Promise.all([
-          getTransactionsByMonth(Number(mesSelecionado)),
+          getTransactionsByMonth(periodo),
           getCategory()
         ]);
-
+  
         const transacoes = transRes.data;
         const categorias = catRes.data;
         setCategories(categorias);
@@ -27,7 +32,6 @@ export default function Dashboards() {
         let ganho = 0;
         let gasto = 0;
         let credito = 0;
-
         const porCategoria = {};
   
         transacoes.forEach((transacao) => {
@@ -39,7 +43,6 @@ export default function Dashboards() {
             if (transacao.formaPagamento === "CREDITO") {
               credito += valor;
             }
-        
             const categoriaId = transacao.categoriaId;
             porCategoria[categoriaId] = (porCategoria[categoriaId] || 0) + valor;
           }
@@ -56,7 +59,7 @@ export default function Dashboards() {
   
     fetchData();
   }, [mesSelecionado]);
-
+  
   return (
     <MainLayout>
       <Styled.Header>
