@@ -11,6 +11,8 @@ export default function Dashboards() {
   const [totalCredito, setTotalCredito] = useState(0);
   const [totalPorCategoria, setTotalPorCategoria] = useState({});
   const [categories, setCategories] = useState([]);
+  const [categoriasExpandidas, setCategoriasExpandidas] = useState({});
+  const [transacoes, setTransacoes] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +28,7 @@ export default function Dashboards() {
         ]);
   
         const transacoes = transRes.data;
+        setTransacoes(transacoes);
         const categorias = catRes.data;
         setCategories(categorias);
   
@@ -59,6 +62,13 @@ export default function Dashboards() {
   
     fetchData();
   }, [mesSelecionado]);
+
+  const toggleCategoria = (categoriaId) => {
+    setCategoriasExpandidas(prev => ({
+      ...prev,
+      [categoriaId]: !prev[categoriaId]
+    }));
+  };
   
   return (
     <MainLayout>
@@ -114,10 +124,24 @@ export default function Dashboards() {
           if (!categoria) return null;
 
           return (
-            <Styled.CategoriaCard key={categoriaId} cor={categoria.cor}>
+            <Styled.CategoriaCard key={categoriaId} cor={categoria.cor} onClick={() => toggleCategoria(categoriaId)}>
               {categoria.icone && <img src={categoria.icone} alt={categoria.nome} style={{ width: 32, height: 32, marginBottom: '0.5rem' }} />}
               <h3>{categoria.nome}</h3>
               <p>R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              {categoriasExpandidas[categoriaId] && (
+                <Styled.Detalhes>
+                  {transacoes
+                    .filter(t => t.categoriaId === Number(categoriaId) && t.tipo === 'SAIDA')
+                    .map(t => (
+                      <Styled.Descricao key={t.id}>
+                        * {t.descricao || 'Sem descrição'} — R${' '}
+                        {parseFloat(t.valor).toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                        })}
+                      </Styled.Descricao>
+                    ))}
+                </Styled.Detalhes>
+              )}
             </Styled.CategoriaCard>
           );
         })}
@@ -135,6 +159,23 @@ const Styled = {
     margin-bottom: 2rem;
     flex-wrap: wrap;
     gap: 1rem;
+  `,
+
+  Descricao: styled.p`
+    margin: 0.5rem 0 0 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+  `,
+
+  Detalhes: styled.div`
+    margin-top: 1rem;
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.3s ease-in-out;
   `,
   
   Title: styled.h1`
