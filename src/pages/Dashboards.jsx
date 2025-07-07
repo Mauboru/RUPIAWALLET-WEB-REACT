@@ -125,7 +125,7 @@ export default function Dashboards() {
 
           return (
             <Styled.CategoriaCard key={categoriaId} cor={categoria.cor} onClick={() => toggleCategoria(categoriaId)}>
-              {categoria.icone && <img src={categoria.icone} alt={categoria.nome} style={{ width: 32, height: 32, marginBottom: '0.5rem' }} />}
+              {categoria.icone && <img src={`${import.meta.env.VITE_BASE_URL}${categoria.icone}`} alt={categoria.nome} style={{ width: 32, height: 32, marginBottom: '0.5rem' }} />}
               <h3>{categoria.nome}</h3>
               <p>R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
               {categoriasExpandidas[categoriaId] && (
