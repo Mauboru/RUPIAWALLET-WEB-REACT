@@ -72,11 +72,26 @@ export default function NovaTransacao() {
 	
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
+	
 		if (file) {
+			const img = new Image();
 			const reader = new FileReader();
+	
 			reader.onloadend = () => {
-				setCategoryData(prev => ({ ...prev, icone: reader.result }));
+				img.onload = () => {
+					if (img.width > 500 || img.height > 500) {
+						setModal({
+							show: true,
+							type: "error",
+							message: "A imagem deve ter no máximo 500x500 pixels.",
+						});
+					} else {
+						setCategoryData(prev => ({ ...prev, icone: reader.result }));
+					}
+				};
+				img.src = reader.result;
 			};
+	
 			reader.readAsDataURL(file);
 		}
 	};
@@ -84,25 +99,29 @@ export default function NovaTransacao() {
 	const handleSubmitCategory = async (e) => {
 		e.preventDefault(); 
 		setLoading(true);
-  
+	
 		try {
-      const response = await newCategory(categoryData);
-      setModal({
-        show: true,
-        type: "success",
-        message: response.data.message,
-      });
-      clearFields();
-    } catch (error) {
-      const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor.";
-      setModal({
-        show: true,
-        type: "error",
-        message: mensagemErro,
-      });
-    } finally {
-      setLoading(false);
-    }
+			const response = await newCategory(categoryData);
+			setModal({
+				show: true,
+				type: "success",
+				message: response.data.message,
+			});
+	
+			const updated = await getCategory();
+			setCategorias(updated.data);
+	
+			clearFields();
+		} catch (error) {
+			const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor.";
+			setModal({
+				show: true,
+				type: "error",
+				message: mensagemErro,
+			});
+		} finally {
+			setLoading(false);
+		}
 	};
 
   const clearFields = () => {
