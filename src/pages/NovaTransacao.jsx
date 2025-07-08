@@ -113,7 +113,7 @@ export default function NovaTransacao() {
 	
 			clearFields();
 		} catch (error) {
-			const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor.";
+			const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor. categoria";
 			setModal({
 				show: true,
 				type: "error",
