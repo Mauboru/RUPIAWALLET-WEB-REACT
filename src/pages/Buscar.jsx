@@ -1,6 +1,7 @@
 import MainLayout from "../layouts/MainLayout";
 import styled from "styled-components";
 import { getTransactionsByMonth, deleteTransaction } from "../services/transacao";
+import { getCategory, deleteCategory } from "../services/category";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +14,9 @@ export default function Buscar() {
   const [categoriaFilter, setCategoriaFilter] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [idParaExcluir, setIdParaExcluir] = useState(null);
+  const [modoVisualizacao, setModoVisualizacao] = useState("transacoes");
+  const [categorias, setCategorias] = useState([]);
+  const [tipoExclusao, setTipoExclusao] = useState(null); 
   const navigate = useNavigate();
 
   function getCurrentMonth() {
@@ -20,8 +24,9 @@ export default function Buscar() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   }
 
-  const abrirModal = (id) => {
+  const abrirModal = (id, tipo) => {
     setIdParaExcluir(id);
+    setTipoExclusao(tipo);
     setModalAberto(true);
   };
 
@@ -43,8 +48,38 @@ export default function Buscar() {
     setFiltered(data);
   }, [formaFilter, categoriaFilter, transactions]);
 
+  useEffect(() => {
+    if (modoVisualizacao === "categorias") {
+      fetchCategorias();
+    }
+  }, [modoVisualizacao]);
+
+  const fetchCategorias = async () => {
+    try {
+      const response = await getCategory();
+      setCategorias(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar categorias:", error);
+    }
+  };
+
+  const confirmarExclusaoCategoria = async () => {
+    try {
+      await deleteCategory(idParaExcluir);
+      await fetchCategorias();
+    } catch (error) {
+      console.error("Erro ao excluir categoria:", error);
+    } finally {
+      fecharModal();
+    }
+  };
+
+  const editarCategoria = (id) => {
+    navigate(`/editar-category/${id}`);
+  };
+
   const handleEdit = (id) => {
-    navigate(`/editar/${id}`);
+    navigate(`/editar-transacao/${id}`);
   }
 
   const fetchTransactions = async () => {
@@ -83,82 +118,133 @@ export default function Buscar() {
 
       <Styled.Filters>
         <div>
-          <label>Mês:</label>
-          <input
-            type="month"
-            value={monthFilter}
-            onChange={(e) => setMonthFilter(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label>Forma:</label>
-          <select value={formaFilter} onChange={(e) => setFormaFilter(e.target.value)}>
-            <option value="">Todas</option>
-            {uniqueFormas.map((f) => (
-              <option key={f} value={f}>{f}</option>
-            ))}
+          <label>Modo:</label>
+          <select value={modoVisualizacao} onChange={(e) => setModoVisualizacao(e.target.value)}>
+            <option value="transacoes">Transações</option>
+            <option value="categorias">Categorias</option>
           </select>
         </div>
 
-        <div>
-          <label>Categoria:</label>
-          <select value={categoriaFilter} onChange={(e) => setCategoriaFilter(e.target.value)}>
-            <option value="">Todas</option>
-            {uniqueCategorias.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
+        {modoVisualizacao === "transacoes" && (
+          <>
+            {/* filtros atuais de transações */}
+            <div>
+              <label>Mês:</label>
+              <input
+                type="month"
+                value={monthFilter}
+                onChange={(e) => setMonthFilter(e.target.value)}
+              />
+            </div>
 
-        <Styled.ClearButton onClick={clearFilters}>Limpar Filtros</Styled.ClearButton>
+            <div>
+              <label>Forma:</label>
+              <select value={formaFilter} onChange={(e) => setFormaFilter(e.target.value)}>
+                <option value="">Todas</option>
+                {uniqueFormas.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label>Categoria:</label>
+              <select value={categoriaFilter} onChange={(e) => setCategoriaFilter(e.target.value)}>
+                <option value="">Todas</option>
+                {uniqueCategorias.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <Styled.ClearButton onClick={clearFilters}>Limpar Filtros</Styled.ClearButton>
+          </>
+        )}
       </Styled.Filters>
 
       <Styled.TableWrapper>
-        {filtered.length === 0 ? (
-          <Styled.EmptyMessage>Nenhuma transação encontrada.</Styled.EmptyMessage>
+        {modoVisualizacao === "transacoes" ? (
+          filtered.length === 0 ? (
+            <Styled.EmptyMessage>Nenhuma transação encontrada.</Styled.EmptyMessage>
+          ) : (
+              <Styled.Table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Forma</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((t) => (
+                    <Styled.TableRow key={t.id} tipo={t.tipo}>
+                      <td>{new Date(t.data).toLocaleDateString()}</td>
+                      <td>{t.descricao}</td>
+                      <td>{t.categoria?.nome || "-"}</td>
+                      <td>{t.formaPagamento}</td>
+                      <td>{t.tipo}</td>
+                      <td>R$ {Number(t.valor).toFixed(2)}</td>
+                      <td>
+                        <Styled.ActionButton onClick={() => handleEdit(t.id)} title="Editar">
+                          <FaEdit />
+                        </Styled.ActionButton>
+                        <Styled.ActionButton onClick={() => abrirModal(t.id, "transacao")} title="Excluir" danger>
+                          <FaTrash />
+                        </Styled.ActionButton>
+                      </td>
+                    </Styled.TableRow>
+                  ))}
+                </tbody>
+              </Styled.Table>
+
+          )
         ) : (
-          <Styled.Table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Forma</th>
-                <th>Categoria</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((t) => (
-                <Styled.TableRow key={t.id} tipo={t.tipo}>
-                  <td>{new Date(t.data).toLocaleDateString("pt-BR")}</td>
-                  <td>{t.descricao}</td>
-                  <td>R$ {parseFloat(t.valor).toFixed(2)}</td>
-                  <td>{t.formaPagamento}</td>
-                  <td>{t.categoria?.nome || "-"}</td>
-                  <td>
-                    <Styled.ActionButton onClick={() => handleEdit(t.id)} title="Editar">
-                      <FaEdit />
-                    </Styled.ActionButton>
-                    <Styled.ActionButton onClick={() => abrirModal(t.id)} title="Excluir" danger>
-                      <FaTrash />
-                    </Styled.ActionButton>
-                  </td>
-                </Styled.TableRow>
-              ))}
-            </tbody>
-          </Styled.Table>
+          categorias.length === 0 ? (
+            <Styled.EmptyMessage>Nenhuma categoria encontrada.</Styled.EmptyMessage>
+          ) : (
+            <Styled.Table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categorias.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.nome}</td>
+                    <td>
+                      <Styled.ActionButton onClick={() => editarCategoria(c.id)} title="Editar">
+                        <FaEdit />
+                      </Styled.ActionButton>
+                      <Styled.ActionButton onClick={() => abrirModal(c.id, "categoria")} title="Excluir" danger>
+                        <FaTrash />
+                      </Styled.ActionButton>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Styled.Table>
+          )
         )}
       </Styled.TableWrapper>
+
       {modalAberto && (
         <Styled.ModalOverlay>
           <Styled.ModalBox>
             <h3>Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja excluir esta transação?</p>
+            {tipoExclusao === "categoria" ? (
+              <p>Ao excluir esta categoria, todas as transações relacionadas também serão removidas. Deseja continuar?</p>
+            ) : (
+              <p>Tem certeza que deseja excluir esta transação?</p>
+            )}
             <Styled.ModalActions>
               <button onClick={fecharModal}>Cancelar</button>
-              <button onClick={confirmarExclusao}>Excluir</button>
+              <button onClick={tipoExclusao === "categoria" ? confirmarExclusaoCategoria : confirmarExclusao}>Excluir</button>
             </Styled.ModalActions>
           </Styled.ModalBox>
         </Styled.ModalOverlay>
