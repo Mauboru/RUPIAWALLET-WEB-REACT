@@ -35,22 +35,25 @@ export default function Dashboards() {
         let ganho = 0;
         let gasto = 0;
         let credito = 0;
-        const porCategoria = {};
-  
+        let porCategoria = {};
+
         transacoes.forEach((transacao) => {
           const valor = parseFloat(transacao.valor);
+          
           if (transacao.tipo === "ENTRADA") {
             ganho += valor;
           } else if (transacao.tipo === "SAIDA") {
             gasto += valor;
+
             if (transacao.formaPagamento === "CREDITO") {
               credito += valor;
             }
+
             const categoriaId = transacao.categoriaId;
             porCategoria[categoriaId] = (porCategoria[categoriaId] || 0) + valor;
           }
         });
-  
+
         setTotalGanho(ganho);
         setTotalGasto(gasto);
         setTotalCredito(credito);
@@ -69,6 +72,41 @@ export default function Dashboards() {
       [categoriaId]: !prev[categoriaId]
     }));
   };
+
+  function getPeriodoFaturaAtual(today = new Date()) {
+    const ano = today.getFullYear();
+  
+    let inicio, fim;
+  
+    if (today.getDate() >= 12) {
+      inicio = new Date(ano, mesSelecionado - 1, 12);
+      fim = new Date(ano, mesSelecionado, 11);
+    } else {
+      inicio = new Date(ano, mesSelecionado - 2, 12); // menos dois por conta do horario
+      fim = new Date(ano, mesSelecionado - 1, 11);
+    }
+  
+    return { inicio, fim };
+  }
+
+  let totalFaturaAtual = 0;
+  let totalFaturaFutura = 0;
+  const { inicio, fim } = getPeriodoFaturaAtual();
+
+  transacoes.forEach((transacao) => {
+    const valor = parseFloat(transacao.valor);
+    const data = new Date(transacao.data);
+
+    if (transacao.tipo === "SAIDA") {
+      if (transacao.formaPagamento === "CREDITO") {
+        if (data >= inicio && data <= fim) {
+          totalFaturaAtual += valor;
+        } else if (data > fim) {
+          totalFaturaFutura += valor;
+        }
+      }
+    }
+  });
   
   return (
     <MainLayout>
@@ -107,12 +145,20 @@ export default function Dashboards() {
         
         <Styled.ResumoCard tipo="saldo">
           <h3>Saldo Atual</h3>
-          <p>R$ {(totalGanho - totalGasto).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p>R$ {Math.max(totalGanho - totalGasto, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </Styled.ResumoCard>
         
         <Styled.ResumoCard tipo="credito">
-          <h3>Fatura Cartão</h3>
-          <p>R$ {totalCredito.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <h3>Fatura Atual</h3>
+          <p>R$ {totalFaturaAtual .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p style={{ fontSize: '0.8rem', color: '#999' }}>
+            Período: {inicio.toLocaleDateString()} a {fim.toLocaleDateString()}
+          </p>
+        </Styled.ResumoCard>
+
+        <Styled.ResumoCard tipo="credito">
+          <h3>Fatura Futura</h3>
+          <p>R$ {totalFaturaFutura.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </Styled.ResumoCard>
       </Styled.ResumoContainer>
         
@@ -156,106 +202,122 @@ const Styled = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
     gap: 1rem;
   `,
 
-  Descricao: styled.p`
-    margin: 0.5rem 0 0 !important;
-    font-size: 0.75rem !important;
-    line-height: 1.4 !important;
+  Title: styled.h1`
+    font-size: 1.75rem;
+    color: #2c3e50;
+    margin: 0 0 1rem;
+    flex: 1 1 100%;
   `,
 
-  Detalhes: styled.div`
-    margin-top: 1rem;
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: left;
-    font-size: 0.9rem;
-    color: #333;
-    transition: all 0.3s ease-in-out;
-  `,
-  
-  Title: styled.h1`
-    color: #2c3e50;
-    font-size: 2rem;
-    margin: 0;
-  `,
-  
   PeriodoSelector: styled.div`
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    
+
     label {
       font-weight: 500;
-      color: #555;
+      color: #333;
     }
-    
+
     select {
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      background: white;
-    }
-  `,
-  
-  ResumoContainer: styled.div`
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 6rem;
-  `,
-  
-  ResumoCard: styled.div`
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    text-align: center;
-    border-left: 4px solid ${props => 
-      props.tipo === 'entrada' ? '#4CAF50' : 
-      props.tipo === 'saida' ? '#F44336' : 
-      props.tipo === 'saldo' ? '#2196F3' : '#9C27B0'};
-    
-    h3 {
-      margin-top: 0;
-      color: #555;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
       font-size: 1rem;
     }
-    
+  `,
+
+  ResumoContainer: styled.div`
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 4rem;
+
+    @media(min-width: 480px) {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+  `,
+
+  ResumoCard: styled.div`
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-left: 4px solid ${props =>
+      props.tipo === 'entrada' ? '#2ecc71' :
+      props.tipo === 'saida' ? '#e74c3c' :
+      props.tipo === 'saldo' ? '#3498db' : '#8e44ad'};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    h3 {
+      font-size: 0.95rem;
+      color: #666;
+      margin: 0 0 0.4rem;
+    }
+
     p {
-      margin-bottom: 0;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: ${props => 
-        props.tipo === 'entrada' ? '#4CAF50' : 
-        props.tipo === 'saida' ? '#F44336' : 
-        props.tipo === 'saldo' ? '#2196F3' : '#9C27B0'};
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0;
+      color: ${props =>
+        props.tipo === 'entrada' ? '#27ae60' :
+        props.tipo === 'saida' ? '#c0392b' :
+        props.tipo === 'saldo' ? '#2980b9' : '#7d3c98'};
     }
   `,
 
   CategoriaCard: styled.div`
-    background: white;
-    border-radius: 10px;
+    background: #fff;
+    border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     border-left: 4px solid ${props => props.cor || '#bdc3c7'};
-    
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    img {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 0.5rem;
+    }
+
     h3 {
-      margin-top: 0;
-      color: #555;
+      margin: 0.25rem 0;
       font-size: 1rem;
+      color: #444;
     }
 
     p {
-      margin-bottom: 0;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      color: ${props => props.cor || '#bdc3c7'};
+      color: ${props => props.cor || '#7f8c8d'};
+      margin: 0;
     }
+  `,
+
+  Detalhes: styled.div`
+    margin-top: 1rem;
+    width: 100%;
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    text-align: left;
+    color: #555;
+  `,
+
+  Descricao: styled.p`
+    font-size: 0.8rem;
+    margin: 0.25rem 0;
   `
 };
