@@ -29,7 +29,7 @@ export default function Dashboards() {
   
         const transacoes = transRes.data;
         setTransacoes(transacoes);
-        const categorias = catRes.data;
+        const categorias = catRes.data.filter(cat => cat.nome !== 'CORREÇÃO');
         setCategories(categorias);
   
         let ganho = 0;
@@ -90,7 +90,7 @@ export default function Dashboards() {
   }
 
   let totalFaturaAtual = 0;
-  let totalFaturaFutura = 0;
+  let totalCaixinhaAtual = 0;
   const { inicio, fim } = getPeriodoFaturaAtual();
 
   transacoes.forEach((transacao) => {
@@ -101,9 +101,9 @@ export default function Dashboards() {
       if (transacao.formaPagamento === "CREDITO") {
         if (data >= inicio && data <= fim) {
           totalFaturaAtual += valor;
-        } else if (data > fim) {
-          totalFaturaFutura += valor;
         }
+      } else if (transacao.categoria.nome === "Caixinha") {
+        totalCaixinhaAtual += valor;
       }
     }
   });
@@ -156,9 +156,9 @@ export default function Dashboards() {
           </p>
         </Styled.ResumoCard>
 
-        <Styled.ResumoCard tipo="credito">
-          <h3>Fatura Futura</h3>
-          <p>R$ {totalFaturaFutura.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+        <Styled.ResumoCard tipo="caixinha">
+          <h3>Caixinha</h3>
+          <p>R$ {totalCaixinhaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </Styled.ResumoCard>
       </Styled.ResumoContainer>
         
@@ -251,7 +251,8 @@ const Styled = {
     border-left: 4px solid ${props =>
       props.tipo === 'entrada' ? '#2ecc71' :
       props.tipo === 'saida' ? '#e74c3c' :
-      props.tipo === 'saldo' ? '#3498db' : '#8e44ad'};
+      props.tipo === 'saldo' ? '#3498db' : 
+      props.tipo === 'caixinha' ? '#dbd034ff' : '#8e44ad'};
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -270,7 +271,8 @@ const Styled = {
       color: ${props =>
         props.tipo === 'entrada' ? '#27ae60' :
         props.tipo === 'saida' ? '#c0392b' :
-        props.tipo === 'saldo' ? '#2980b9' : '#7d3c98'};
+        props.tipo === 'saldo' ? '#2980b9' :
+        props.tipo === 'caixinha' ? '#ada200ff' : '#7d3c98'};
     }
   `,
 
