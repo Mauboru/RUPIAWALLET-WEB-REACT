@@ -32,7 +32,7 @@ const Main = styled.div`
 
 const Content = styled.main`
   flex: 1;
-  background-color: #f2f2f2;
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 2rem;
   overflow-y: auto;
   height: 100%;

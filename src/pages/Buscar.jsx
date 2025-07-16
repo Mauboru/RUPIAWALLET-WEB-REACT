@@ -258,7 +258,7 @@ const Styled = {
     margin: 24px 16px;
     font-size: 24px;
     font-weight: 600;
-    color: #2c3e50;
+    color: ${({ theme }) => theme.colors.text};
   `,
 
   TableRow: styled.tr`

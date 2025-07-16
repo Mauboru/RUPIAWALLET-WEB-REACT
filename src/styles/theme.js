@@ -1,23 +1,23 @@
 import { darken } from 'polished';
 
-const primaryColor = '#0A42AB'; // Azul forte de alta visibilidade
+const primaryColor = '#590664ff';
 
 const theme = {
     colors: {
         primary: primaryColor,
-        primaryDark: darken(0.15, primaryColor),     // 15% mais escuro
-        primaryDarkTwo: darken(0.3, primaryColor),    // 30% mais escuro
-        primaryTransparent1: 'rgba(10, 66, 171, 0.5)',  // 50% opacidade
-        primaryTransparent2: 'rgba(10, 66, 171, 0.15)', // 15% opacidade
+        primaryDark: darken(0.15, primaryColor),   
+        primaryDarkTwo: darken(0.3, primaryColor),
+        primaryTransparent1: 'rgba(10, 66, 171, 0.5)',
+        primaryTransparent2: 'rgba(10, 66, 171, 0.15)',
 
-        background: '#000',      // Fundo preto
-        text: '#FFFFFF',         // Texto branco para contraste perfeito
-        inputBg: '#121212',      // Fundo de input levemente diferente do fundo principal
-        inputBorder: darken(0.1, primaryColor), // Borda do input um pouco escurecida
-        placeholder: '#AAAAAA',  // Placeholder cinza claro
-        linkPlaceholder: '#FFFFFF', // Link normal em branco
+        background: '#000000b2',
+        text: '#FFFFFF',
+        inputBg: '#121212',
+        inputBorder: darken(0.1, primaryColor),
+        placeholder: '#AAAAAA',
+        linkPlaceholder: '#FFFFFF',
 
-        disabledBg: '#1F1F1F',    // Cinza escuro para input desabilitado
+        disabledBg: '#1F1F1F',
         disabledBorder: '#333333',
         disabledText: '#777777',
 
