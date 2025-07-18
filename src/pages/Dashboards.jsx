@@ -113,7 +113,6 @@ export default function Dashboards() {
       <Styled.Header>
         <Styled.Title>Dashboard Financeiro</Styled.Title>
         <Styled.PeriodoSelector>
-        <label>Mês:</label>
           <select value={mesSelecionado} onChange={(e) => setMesSelecionado(e.target.value)}>
             <option value="1">Janeiro</option>
             <option value="2">Fevereiro</option>
