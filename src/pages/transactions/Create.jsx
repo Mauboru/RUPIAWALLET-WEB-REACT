@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
+import MainLayout from "../../layouts/MainLayout";
 import styled from "styled-components";
-import { newTransaction } from '../services/transacao';
-import { getCategory, newCategory } from '../services/category';
-import { CustomModal } from "../components";
+import { newTransaction } from '../../services/transacao';
+import { getCategory, newCategory } from '../../services/category';
+import { CustomModal } from "../../components";
 
-export default function NovaTransacao() {
+export default function Create() {
   const [data, setData] = useState({
     tipo: "",
     categoriaId: "",
@@ -298,15 +298,10 @@ const Styled = {
 	`,
 		
 	TitleAndSelect: styled.div`
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 1.5rem;
-		max-width: 600px;
-		margin-left: auto;
-		margin-right: auto;
-		gap: 1rem;
-		flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+		margin-bottom: 20px;
 	`,
 
 	FieldGroup: styled.div`
@@ -345,12 +340,14 @@ const Styled = {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     font-family: 'Segoe UI', sans-serif;
   `,
+
   Title: styled.h2`
     text-align: center;
     margin-bottom: 2rem;
     font-size: 2rem;
     color: #333;
   `,
+	
   Form: styled.form`
     display: flex;
     flex-direction: column;
@@ -363,12 +360,14 @@ const Styled = {
     border-radius: 8px;
     font-size: 1rem;
   `,
+
   Select: styled.select`
     padding: 0.75rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
   `,
+
   Textarea: styled.textarea`
     padding: 0.75rem;
     border: 1px solid #ccc;
@@ -377,12 +376,14 @@ const Styled = {
     font-size: 1rem;
     min-height: 80px;
   `,
+
   CheckboxLabel: styled.label`
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 1rem;
   `,
+
   Button: styled.button`
     padding: 0.9rem;
     background-color: #007bff;
