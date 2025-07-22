@@ -113,7 +113,6 @@ export default function Dashboards() {
       <Styled.Header>
         <Styled.Title>Dashboard Financeiro</Styled.Title>
         <Styled.PeriodoSelector>
-        <label>Mês:</label>
           <select value={mesSelecionado} onChange={(e) => setMesSelecionado(e.target.value)}>
             <option value="1">Janeiro</option>
             <option value="2">Fevereiro</option>
@@ -165,27 +164,47 @@ export default function Dashboards() {
       {/* Soma por Categoria */}
       <Styled.Title>Soma por Categoria</Styled.Title>
       <Styled.ResumoContainer>
-        {Object.entries(totalPorCategoria).map(([categoriaId, valor]) => {
+        {Object.entries(totalPorCategoria).map(([categoriaId, _]) => {
           const categoria = categories.find(cat => cat.id === Number(categoriaId));
           if (!categoria) return null;
 
+          // Transações filtradas conforme a lógica
+          const transacoesFiltradas = transacoes.filter(t => {
+            const mesmoId = t.categoriaId === Number(categoriaId);
+            const saida = t.tipo === 'SAIDA';
+
+            if (categoria.nome === 'Cartão de Crédito') {
+              return saida && t.formaPagamento === 'CREDITO'; // apenas se for crédito
+            }
+
+            return mesmoId && saida; // padrão
+          });
+
+          // Soma com base nas transações filtradas
+          const valorTotal = transacoesFiltradas.reduce((acc, t) => acc + parseFloat(t.valor), 0);
+
           return (
             <Styled.CategoriaCard key={categoriaId} cor={categoria.cor} onClick={() => toggleCategoria(categoriaId)}>
-              {categoria.icone && <img src={`${import.meta.env.VITE_BASE_URL}${categoria.icone}`} alt={categoria.nome} style={{ width: 32, height: 32, marginBottom: '0.5rem' }} />}
+              {categoria.icone && (
+                <img
+                  src={`${import.meta.env.VITE_BASE_URL}${categoria.icone}`}
+                  alt={categoria.nome}
+                  style={{ width: 32, height: 32, marginBottom: '0.5rem' }}
+                />
+              )}
               <h3>{categoria.nome}</h3>
-              <p>R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p>R$ {valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+
               {categoriasExpandidas[categoriaId] && (
                 <Styled.Detalhes>
-                  {transacoes
-                    .filter(t => t.categoriaId === Number(categoriaId) && t.tipo === 'SAIDA')
-                    .map(t => (
-                      <Styled.Descricao key={t.id}>
-                        * {t.descricao || 'Sem descrição'} — R${' '}
-                        {parseFloat(t.valor).toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                        })}
-                      </Styled.Descricao>
-                    ))}
+                  {transacoesFiltradas.map(t => (
+                    <Styled.Descricao key={t.id}>
+                      * {t.descricao || 'Sem descrição'} — R${' '}
+                      {parseFloat(t.valor).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </Styled.Descricao>
+                  ))}
                 </Styled.Detalhes>
               )}
             </Styled.CategoriaCard>
@@ -209,7 +228,7 @@ const Styled = {
 
   Title: styled.h1`
     font-size: 1.75rem;
-    color: #2c3e50;
+    color: ${({ theme }) => theme.colors.text};
     margin: 0 0 1rem;
     flex: 1 1 100%;
   `,

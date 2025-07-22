@@ -12,11 +12,15 @@ export default function Buscar() {
   const [monthFilter, setMonthFilter] = useState(getCurrentMonth());
   const [formaFilter, setFormaFilter] = useState("");
   const [categoriaFilter, setCategoriaFilter] = useState("");
+  const [tipoFilter, setTipoFilter] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [idParaExcluir, setIdParaExcluir] = useState(null);
   const [modoVisualizacao, setModoVisualizacao] = useState("transacoes");
   const [categorias, setCategorias] = useState([]);
   const [tipoExclusao, setTipoExclusao] = useState(null); 
+  const uniqueFormas = [...new Set(transactions.map((t) => t.formaPagamento))];
+  const uniqueCategorias = [...new Set(transactions.map((t) => t.categoria?.nome || ""))];
+  const uniqueTipo = [...new Set(transactions.map((t) => t.tipo))];
   const navigate = useNavigate();
 
   function getCurrentMonth() {
@@ -44,43 +48,16 @@ export default function Buscar() {
 
     if (formaFilter) data = data.filter((t) => t.formaPagamento === formaFilter);
     if (categoriaFilter) data = data.filter((t) => t.categoria?.nome === categoriaFilter);
+    if (tipoFilter) data = data.filter((t) => t.tipo === tipoFilter);
 
     setFiltered(data);
-  }, [formaFilter, categoriaFilter, transactions]);
+  }, [formaFilter, categoriaFilter, tipoFilter, transactions]);
 
   useEffect(() => {
     if (modoVisualizacao === "categorias") {
       fetchCategorias();
     }
   }, [modoVisualizacao]);
-
-  const fetchCategorias = async () => {
-    try {
-      const response = await getCategory();
-      setCategorias(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar categorias:", error);
-    }
-  };
-
-  const confirmarExclusaoCategoria = async () => {
-    try {
-      await deleteCategory(idParaExcluir);
-      await fetchCategorias();
-    } catch (error) {
-      console.error("Erro ao excluir categoria:", error);
-    } finally {
-      fecharModal();
-    }
-  };
-
-  const editarCategoria = (id) => {
-    navigate(`/editar-category/${id}`);
-  };
-
-  const handleEdit = (id) => {
-    navigate(`/editar-transacao/${id}`);
-  }
 
   const fetchTransactions = async () => {
     try {
@@ -92,7 +69,27 @@ export default function Buscar() {
     }
   };
 
-  const confirmarExclusao = async () => {
+  const fetchCategorias = async () => {
+    try {
+      const response = await getCategory();
+      setCategorias(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar categorias:", error);
+    }
+  };
+
+  const confirmDeleteCategory = async () => {
+    try {
+      await deleteCategory(idParaExcluir);
+      await fetchCategorias();
+    } catch (error) {
+      console.error("Erro ao excluir categoria:", error);
+    } finally {
+      fecharModal();
+    }
+  };
+
+  const confirmDeleteTransaction = async () => {
     try {
       await deleteTransaction(idParaExcluir);
       await fetchTransactions();
@@ -103,13 +100,19 @@ export default function Buscar() {
     }
   };
 
-  const uniqueFormas = [...new Set(transactions.map((t) => t.formaPagamento))];
-  const uniqueCategorias = [...new Set(transactions.map((t) => t.categoria?.nome || ""))];
+  const editCategory = (id) => {
+    navigate(`/editar-category/${id}`);
+  };
+
+  const editTransaction = (id) => {
+    navigate(`/editar-transacao/${id}`);
+  }
 
   const clearFilters = () => {
     setMonthFilter(getCurrentMonth());
     setFormaFilter("");
     setCategoriaFilter("");
+    setTipoFilter("");
   };
 
   return (
@@ -157,6 +160,16 @@ export default function Buscar() {
               </select>
             </div>
 
+            <div>
+              <label>Tipo:</label>
+              <select value={tipoFilter} onChange={(e) => setTipoFilter(e.target.value)}>
+                <option value="">Todas</option>
+                {uniqueTipo.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
             <Styled.ClearButton onClick={clearFilters}>Limpar Filtros</Styled.ClearButton>
           </>
         )}
@@ -182,14 +195,15 @@ export default function Buscar() {
                 <tbody>
                   {filtered.map((t) => (
                     <Styled.TableRow key={t.id} tipo={t.tipo}>
-                      <td>{new Date(t.data).toLocaleDateString()}</td>
+                      <td>{new Date(t.data + 'T00:00:00').toLocaleDateString()}</td>
+
                       <td>{t.descricao}</td>
                       <td>{t.categoria?.nome || "-"}</td>
                       <td>{t.formaPagamento}</td>
                       <td>{t.tipo}</td>
                       <td>R$ {Number(t.valor).toFixed(2)}</td>
                       <td>
-                        <Styled.ActionButton onClick={() => handleEdit(t.id)} title="Editar">
+                        <Styled.ActionButton onClick={() => editTransaction(t.id)} title="Editar">
                           <FaEdit />
                         </Styled.ActionButton>
                         <Styled.ActionButton onClick={() => abrirModal(t.id, "transacao")} title="Excluir" danger>
@@ -218,7 +232,7 @@ export default function Buscar() {
                   <tr key={c.id}>
                     <td>{c.nome}</td>
                     <td>
-                      <Styled.ActionButton onClick={() => editarCategoria(c.id)} title="Editar">
+                      <Styled.ActionButton onClick={() => editCategory(c.id)} title="Editar">
                         <FaEdit />
                       </Styled.ActionButton>
                       <Styled.ActionButton onClick={() => abrirModal(c.id, "categoria")} title="Excluir" danger>
@@ -244,7 +258,7 @@ export default function Buscar() {
             )}
             <Styled.ModalActions>
               <button onClick={fecharModal}>Cancelar</button>
-              <button onClick={tipoExclusao === "categoria" ? confirmarExclusaoCategoria : confirmarExclusao}>Excluir</button>
+              <button onClick={tipoExclusao === "categoria" ? confirmDeleteCategory : confirmDeleteTransaction}>Excluir</button>
             </Styled.ModalActions>
           </Styled.ModalBox>
         </Styled.ModalOverlay>
@@ -258,7 +272,7 @@ const Styled = {
     margin: 24px 16px;
     font-size: 24px;
     font-weight: 600;
-    color: #2c3e50;
+    color: ${({ theme }) => theme.colors.text};
   `,
 
   TableRow: styled.tr`
@@ -299,7 +313,7 @@ const Styled = {
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 6px;
-      color: #34495e;
+      color: #bdc4caff;
     }
 
     input,
@@ -343,7 +357,7 @@ const Styled = {
     font-weight: 600;
     cursor: pointer;
     height: 40px;
-    align-self: flex-start;
+    align-self: flex-end; // <-- alterado aqui
     transition: background-color 0.3s ease;
 
     &:hover {

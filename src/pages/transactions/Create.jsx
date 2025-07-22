@@ -344,8 +344,8 @@ const Styled = {
   Title: styled.h2`
     text-align: center;
     margin-bottom: 2rem;
+	color: ${({ theme }) => theme.colors.text};
     font-size: 2rem;
-    color: #333;
   `,
 	
   Form: styled.form`
