@@ -10,6 +10,8 @@ const theme = {
         primaryTransparent1: 'rgba(10, 66, 171, 0.5)',
         primaryTransparent2: 'rgba(10, 66, 171, 0.15)',
 
+        span: '#78d64cff',
+
         background: '#000000b2',
         text: '#FFFFFF',
         inputBg: '#121212',

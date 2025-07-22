@@ -21,25 +21,24 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <Styled.HeroSection>
-        <Styled.HeroContent>
+      <Styled.AboutSection>
+        <Styled.Content>
           <h1>
-            Guarde. <span className="green">Economize</span>. Controle suas finanças com <Styled.YellowText>Rupia Wallet</Styled.YellowText>
+            Guarde. <span className="green">Economize</span>. Controle suas finanças com <Styled.Span>Rupia Wallet</Styled.Span>
           </h1>
           <Styled.Text>
-            Transmissões ao vivo das maiores corridas do mundo.
-            Ganhe dinheiro com apostas rápidas e confiáveis.
-            Junte-se à nossa equipe de filmagem e participe do show.
+            Plataforma completa para controle financeiro.
+            Ideal para empresas e profissionais que buscam eficiência e clareza.
           </Styled.Text>
-        </Styled.HeroContent>
+        </Styled.Content>
 
-        <Styled.HeroImage>
+        <Styled.Image>
           <img
             src="./background.png"
             alt="Corrida de apostas"
           />
-        </Styled.HeroImage>
-      </Styled.HeroSection>
+        </Styled.Image>
+      </Styled.AboutSection>
     </MainLayout>
   );
 }
@@ -68,11 +67,11 @@ const Styled = {
     margin: 0.7rem 0;
   `,
   
-  YellowText: styled.span`
-    color: ${({ theme }) => theme.colors.primary};
+  Span: styled.span`
+    color: ${({ theme }) => theme.colors.span};
   `,
 
-  HeroSection: styled.section`
+  AboutSection: styled.section`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -89,14 +88,20 @@ const Styled = {
     }
   `,
 
-  HeroImage: styled.div`
+  Image: styled.div`
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 
     img {
-      max-width: 80%;
+      max-width: 400px;
+      max-height: 300px;
+      width: 100%;
       height: auto;
+      object-fit: contain;
     }
 
     @media (max-width: 768px) {
@@ -105,13 +110,15 @@ const Styled = {
       margin-bottom: 1.5rem;
 
       img {
-        max-width: 100%;
+        max-width: 115px;
+        width: 100%;
         height: auto;
+        object-fit: contain;
       }
     }
   `,
 
-  HeroContent: styled.div`
+  Content: styled.div`
     flex: 1;
     max-width: 700px;
     margin: 0 auto;

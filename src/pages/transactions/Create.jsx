@@ -291,16 +291,15 @@ export default function Create() {
 
 const Styled = {
 	ScrollContainer: styled.div`
-		max-height: calc(100vh - 100px); /* ajusta 100px conforme altura do header/footer */
 		overflow-y: auto;
 		padding: 1rem;
 		margin-bottom: 3rem;
 	`,
 		
 	TitleAndSelect: styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.2rem;
 		margin-bottom: 20px;
 	`,
 
