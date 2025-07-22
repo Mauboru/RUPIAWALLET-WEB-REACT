@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -21,71 +21,99 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <Styled.AboutSection>
-        <Styled.Content>
-          <h1>
-            Guarde. <span className="green">Economize</span>. Controle suas finanças com <Styled.Span>Rupia Wallet</Styled.Span>
-          </h1>
-          <Styled.Text>
-            Plataforma completa para controle financeiro.
-            Ideal para empresas e profissionais que buscam eficiência e clareza.
-          </Styled.Text>
-        </Styled.Content>
+      <Styled.Content>
+        {/* Seção principal */}
+        <Styled.Section>
+          <Styled.TextContent>
+            <Styled.Title>
+              Guarde. <span className="green">Economize</span>. Controle suas finanças com <Styled.Span>Rupia Wallet</Styled.Span>
+            </Styled.Title>
+            <Styled.Text>
+              Plataforma completa para controle financeiro. Ideal para empresas e profissionais que buscam eficiência e clareza.
+            </Styled.Text>
+          </Styled.TextContent>
 
-        <Styled.Image>
-          <img
-            src="./background.png"
-            alt="Corrida de apostas"
-          />
-        </Styled.Image>
-      </Styled.AboutSection>
+          <Styled.Image>
+            <img src="./background.png" alt="Imagem ilustrativa do sistema" />
+          </Styled.Image>
+        </Styled.Section>
+
+        {/* Sobre o sistema */}
+        <Styled.Section vertical>
+          <Styled.Title>Sobre o <Styled.Span>Sistema</Styled.Span></Styled.Title>
+          <Styled.Text>
+            O Rupia Wallet foi desenvolvido para facilitar a gestão financeira de pessoas físicas e jurídicas.
+            Com ele, você pode acompanhar entradas e saídas, categorizar transações, gerar relatórios e visualizar o desempenho financeiro com total clareza e praticidade.
+          </Styled.Text>
+        </Styled.Section>
+
+        {/* Sobre nós */}
+        <Styled.Section vertical>
+          <Styled.Title>Sobre a <Styled.Span>Tecnomaub</Styled.Span></Styled.Title>
+          <Styled.Text>
+            A Tecnomaub é uma empresa focada em soluções digitais personalizadas. Nosso compromisso é criar experiências eficientes,
+            intuitivas e seguras para transformar a forma como você interage com a tecnologia.
+            Atuamos com desenvolvimento full stack, automação e consultoria especializada para empresas que buscam inovação com solidez.
+          </Styled.Text>
+        </Styled.Section>
+      </Styled.Content>
     </MainLayout>
   );
 }
 
 const Styled = {
-  ContentWrapper: styled.section`
-    text-align: center;
-    margin-top: 3rem;
-    color: #222;
-    max-width: 720px;
-    margin-left: auto;
-    margin-right: auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  Content: styled.div`
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
   `,
 
-  MainTitle: styled.h1`
+  Section: styled.section`
+    display: flex;
+    flex-direction: ${({ vertical }) => (vertical ? "column" : "row")};
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 4rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+    }
+  `,
+
+  Title: styled.h1`
     font-size: 2.5rem;
     font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 2rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+
+    .green {
+      color: #02f065;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
   `,
 
-  InfoText: styled.p`
-    color: #555;
+  Text: styled.p`
     font-size: 1.15rem;
-    margin: 0.7rem 0;
+    line-height: 1.7;
+    color: ${({ theme }) => theme.colors.text};
+    max-width: 800px;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
   `,
-  
+
   Span: styled.span`
     color: ${({ theme }) => theme.colors.span};
   `,
 
-  AboutSection: styled.section`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4rem 2rem;
-    background: transparent;
-    flex-wrap: nowrap;
-    gap: 2rem;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      padding: 2rem 1rem;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
+  TextContent: styled.div`
+    flex: 1;
   `,
 
   Image: styled.div`
@@ -93,78 +121,17 @@ const Styled = {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
 
     img {
       max-width: 400px;
-      max-height: 300px;
-      width: 100%;
       height: auto;
       object-fit: contain;
     }
 
     @media (max-width: 768px) {
-      order: 0;
-      max-width: 100%;
-      margin-bottom: 1.5rem;
-
       img {
-        max-width: 115px;
-        width: 100%;
-        height: auto;
-        object-fit: contain;
+        max-width: 220px;
       }
-    }
-  `,
-
-  Content: styled.div`
-    flex: 1;
-    max-width: 700px;
-    margin: 0 auto;
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-      color: white;
-
-      .green {
-        color: #02f065ff;
-      }
-    }
-
-    @media (max-width: 768px) {
-      order: 1;
-      max-width: 100%;
-      padding: 0 1rem;
-      text-align: center;
-
-      h1 {
-        font-size: 2rem;
-      }
-    }
-  `,
-  
-  Text: styled.p`
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: ${({ theme }) => theme.colors.text};
-    text-align: left;
-
-    @media (max-width: 768px) {
-      text-align: center;
-      font-size: 1rem;
-    }
-  `,
-
-  Grid: styled.div`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 1rem;
     }
   `,
 };

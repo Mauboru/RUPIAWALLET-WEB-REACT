@@ -332,13 +332,14 @@ const Styled = {
     background: #f8f8f8;
     border-radius: 8px;
     padding: 0.75rem;
-    font-size: 0.9rem;
     text-align: left;
     color: #555;
   `,
 
   Descricao: styled.p`
-    font-size: 0.8rem;
+    font-size: 0.8rem !important;
+    font-weight: 500;
+    color: ${props => props.cor || '#7f8c8d'};
     margin: 0.25rem 0;
   `
 };
