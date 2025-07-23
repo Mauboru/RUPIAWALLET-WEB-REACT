@@ -2,24 +2,16 @@ import { useEffect, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import styled from "styled-components";
 import { newTransaction } from '../../services/transacao';
-import { getCategory, newCategory } from '../../services/category';
+import { getCategory } from '../../services/category';
 import { CustomModal } from "../../components";
+import { FaPlus } from "react-icons/fa";
 
 export default function Create() {
-  const [data, setData] = useState({
-    tipo: "",
-    categoriaId: "",
-    descricao: "",
-    valor: "",
-    data: new Date().toISOString().split("T")[0],
-    formaPagamento: "",
-  }); 
-  const [categoryData, setCategoryData] = useState({ tipo: "", nome: "", cor: "#000000", icone: "" }); 
+  const [data, setData] = useState({ tipo: "", categoriaId: "", descricao: "", valor: "", data: new Date().toISOString().split("T")[0], formaPagamento: "" }); 
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState([]);
   const [modal, setModal] = useState({ show: false, type: "info", message: "" });
   const [rawValor, setRawValor] = useState("");
-  const [chooseModalInsert, setChooseModalInsert] = useState(1);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -33,9 +25,8 @@ export default function Create() {
         setLoading(false);
       }
     };
-  
-		if (chooseModalInsert === 1) fetchCategorias();
-  }, [chooseModalInsert]);
+		fetchCategorias();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,61 +60,6 @@ export default function Create() {
       setLoading(false);
     }
 	};
-	
-	const handleImageChange = (event) => {
-		const file = event.target.files[0];
-	
-		if (file) {
-			const img = new Image();
-			const reader = new FileReader();
-	
-			reader.onloadend = () => {
-				img.onload = () => {
-					if (img.width > 500 || img.height > 500) {
-						setModal({
-							show: true,
-							type: "error",
-							message: "A imagem deve ter no máximo 500x500 pixels.",
-						});
-					} else {
-						setCategoryData(prev => ({ ...prev, icone: reader.result }));
-					}
-				};
-				img.src = reader.result;
-			};
-	
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const handleSubmitCategory = async (e) => {
-		e.preventDefault(); 
-		setLoading(true);
-	
-		try {
-			const response = await newCategory(categoryData);
-			setModal({
-				show: true,
-				type: "success",
-				message: response.data.message,
-			});
-	
-			const updated = await getCategory();
-			setCategorias(updated.data);
-	
-			clearFields();
-		} catch (error) {
-			console.log(error)
-			const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor. categoria";
-			setModal({
-				show: true,
-				type: "error",
-				message: mensagemErro,
-			});
-		} finally {
-			setLoading(false);
-		}
-	};
 
   const clearFields = () => {
     setData({
@@ -134,13 +70,6 @@ export default function Create() {
       data: new Date().toISOString().split("T")[0], 
       formaPagamento: "",
 		});
-		setCategoryData({
-      tipo: "",
-      nome: "",
-			icone: "",
-			cor: "#000000"
-    });
-    setRawValor("");
   };
 
   const handleCurrencyChange = (e) => {
@@ -165,125 +94,65 @@ export default function Create() {
   return (
 		<MainLayout>
 			<Styled.ScrollContainer>
-				<Styled.TitleAndSelect>
-					<Styled.Title>
-						{chooseModalInsert === 1 ? "Nova Transação" : "Nova Categoria"}
-					</Styled.Title>
-					<Styled.Select
-						value={chooseModalInsert}
-						onChange={(e) => setChooseModalInsert(Number(e.target.value))}
-					>
-						<option value={1}>Transação</option>
-						<option value={2}>Categoria</option>
+        <Styled.Title>
+          Transação <FaPlus style={{ marginLeft: 6, fontSize: "0.8rem" }} />
+        </Styled.Title>
+
+				<Styled.Form onSubmit={handleSubmit}> 
+					<Styled.Input
+						name="data"
+						type="date"
+						value={data.data}
+						onChange={handleChange}
+						required
+					/>
+
+					<Styled.Select name="tipo" value={data.tipo} onChange={handleChange} required>
+						<option value="" disabled>Selecione o tipo</option>
+						<option value="ENTRADA">ENTRADA</option>
+						<option value="SAIDA">SAÍDA</option>
 					</Styled.Select>
-				</Styled.TitleAndSelect>
 
-				{ chooseModalInsert === 1 ? (
-					<>
-						<Styled.Form onSubmit={handleSubmit}> 
+					<Styled.Select name="formaPagamento" value={data.formaPagamento} onChange={handleChange} required>
+						<option value="" disabled>Selecione a forma de pagamento</option>
+						<option value="DINHEIRO">DINHEIRO</option>
+						<option value="PIX">PIX</option>
+						<option value="CREDITO">CRÉDITO</option>
+						<option value="DEBITO">DÉBITO</option>
+					</Styled.Select>
 
-							<Styled.Input
-								name="data"
-								type="date"
-								value={data.data}
-								onChange={handleChange}
-								required
-							/>
+					<Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
+						<option value="">Selecione uma categoria</option>
+						{categorias.map((cat) => (
+						<option key={cat.id} value={cat.id}>{cat.nome}</option>
+						))}
+					</Styled.Select>
 
-							<Styled.Select name="tipo" value={data.tipo} onChange={handleChange} required>
-								<option value="" disabled>Selecione o tipo</option>
-								<option value="ENTRADA">ENTRADA</option>
-								<option value="SAIDA">SAÍDA</option>
-							</Styled.Select>
+					<Styled.Input
+						name="descricao"
+						placeholder="Descrição"
+						value={data.descricao}
+						onChange={handleChange}
+						required
+					/>
 
-							<Styled.Select name="formaPagamento" value={data.formaPagamento} onChange={handleChange} required>
-								<option value="" disabled>Selecione a forma de pagamento</option>
-								<option value="DINHEIRO">DINHEIRO</option>
-								<option value="PIX">PIX</option>
-								<option value="CREDITO">CRÉDITO</option>
-								<option value="DEBITO">DÉBITO</option>
-							</Styled.Select>
+					<Styled.Input
+						name="valor"
+						type="text"
+						placeholder="Valor"
+						value={data.valor}
+						onChange={handleCurrencyChange}
+						required
+					/>
 
-							<Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
-								<option value="">Selecione uma categoria</option>
-								{categorias.map((cat) => (
-								<option key={cat.id} value={cat.id}>{cat.nome}</option>
-								))}
-							</Styled.Select>
-
-							<Styled.Input
-								name="descricao"
-								placeholder="Descrição"
-								value={data.descricao}
-								onChange={handleChange}
-								required
-							/>
-
-							<Styled.Input
-								name="valor"
-								type="text"
-								placeholder="Valor"
-								value={data.valor}
-								onChange={handleCurrencyChange}
-								required
-							/>
-
-							<Styled.Button type="submit">Salvar</Styled.Button>
-						</Styled.Form>
-						<CustomModal
-							show={modal.show}
-							type={modal.type}
-							message={modal.message}
-							onHide={() => setModal({ ...modal, show: false })}
-						/>
-					</>
-				) : (
-						<>
-							<Styled.Form onSubmit={handleSubmitCategory}> 
-								<Styled.Select name="tipo" value={categoryData.tipo} onChange={(e) => setCategoryData({ ...categoryData, tipo: e.target.value })} required>
-									<option value="" disabled>Selecione o tipo</option>
-									<option value="gasto">GASTO</option>
-									<option value="ganho">GANHO</option>
-								</Styled.Select>
-								
-
-								<Styled.Input
-									name="nome"
-									placeholder="Nome"
-									value={categoryData.nome}
-									onChange={(e) => setCategoryData({ ...categoryData, nome: e.target.value })}
-									required
-								/>
-									
-								<Styled.Input
-									type="file"
-									name="icone"
-									accept="image/*"
-									onChange={handleImageChange}
-								/>
-
-								<Styled.FieldGroup>
-									<Styled.Label>Cor:</Styled.Label>
-									<Styled.ColorInput
-										type="color"
-										name="cor"
-										value={categoryData.cor}
-										onChange={(e) => setCategoryData({ ...categoryData, cor: e.target.value })}
-									/>
-									<Styled.ColorCode>{categoryData.cor}</Styled.ColorCode>
-								</Styled.FieldGroup>
-
-								<Styled.Button type="submit">Salvar</Styled.Button>
-
-							</Styled.Form>
-							<CustomModal
-								show={modal.show}
-								type={modal.type}
-								message={modal.message}
-								onHide={() => setModal({ ...modal, show: false })}
-								/>
-						</>
-				)}
+					<Styled.Button type="submit">Salvar</Styled.Button>
+				</Styled.Form>
+				<CustomModal
+					show={modal.show}
+					type={modal.type}
+					message={modal.message}
+					onHide={() => setModal({ ...modal, show: false })}
+				/>
       </Styled.ScrollContainer>
     </MainLayout>
   );
@@ -295,50 +164,6 @@ const Styled = {
 		padding: 1rem;
 		margin-bottom: 3rem;
 	`,
-		
-	TitleAndSelect: styled.div`
-		display: flex;
-		flex-direction: column;
-		gap: 1.2rem;
-		margin-bottom: 20px;
-	`,
-
-	FieldGroup: styled.div`
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	`,
-
-	Label: styled.label`
-		font-size: 1rem;
-		font-weight: 500;
-		color: #333;
-	`,
-
-	ColorInput: styled.input`
-		width: 40px;
-		height: 40px;
-		border: none;
-		padding: 0;
-		background: none;
-		cursor: pointer;
-	`,
-
-	ColorCode: styled.span`
-		font-size: 0.95rem;
-		color: #555;
-		font-family: monospace;
-	`,
-
-  ContentWrapper: styled.div`
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', sans-serif;
-  `,
 
   Title: styled.h2`
     text-align: center;
@@ -367,22 +192,6 @@ const Styled = {
     font-size: 1rem;
   `,
 
-  Textarea: styled.textarea`
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    resize: vertical;
-    font-size: 1rem;
-    min-height: 80px;
-  `,
-
-  CheckboxLabel: styled.label`
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-  `,
-
   Button: styled.button`
     padding: 0.9rem;
     background-color: #007bff;
@@ -396,5 +205,5 @@ const Styled = {
     &:hover {
       background-color: #0056b3;
     }
-  `
+  `,
 };

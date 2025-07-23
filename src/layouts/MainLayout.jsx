@@ -5,8 +5,8 @@ export default function MainLayout({ children }) {
     return (
       <Wrapper>
         <Main>
-          <Footer/>
           <Content>{children}</Content>
+          <Footer/>
         </Main>
       </Wrapper>
     );

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Create from "../pages/transactions/Create";
+import CreateTransaction from "../pages/transactions/Create";
+import CreateCategorie from "../pages/categories/Create";
 import EditarTransacao from "../pages/EditarTransacao";
 import EditarCategoria from "../pages/EditarCategoria";
 import Dashboards from "../pages/Dashboards";
@@ -20,7 +21,8 @@ export default function AppRoutes() {
                 <Route path="/not-authorized" element={<NotAuthorized />} />
                 <Route path="*" element={<NotFound />} />
 
-                <Route path="/inserir" element={<Create />} />
+                <Route path="/inserir/transacoes" element={<CreateTransaction />} />
+                <Route path="/inserir/categorias" element={<CreateCategorie />} />
                 <Route path="/editar-transacao/:id" element={<EditarTransacao />} />
                 <Route path="/editar-category/:id" element={<EditarCategoria />} />
                 <Route path="/dashboards" element={<Dashboards />} />

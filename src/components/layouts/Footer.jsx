@@ -1,10 +1,12 @@
 import { styled } from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaHome, FaSearch, FaPlusCircle, FaChartPie, FaUser } from "react-icons/fa";
+import { useState } from "react";
 
 export default function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showModal, setShowModal] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
@@ -15,7 +17,7 @@ export default function Footer() {
         <Styled.Label>Buscar</Styled.Label>
       </Styled.FooterButton>
 
-      <Styled.FooterButton onClick={() => navigate("/inserir")} $active={isActive("/inserir")}>
+      <Styled.FooterButton onClick={() => setShowModal(true)} $active={isActive("/inserir")}>
         <FaPlusCircle />
         <Styled.Label>Inserir</Styled.Label>
       </Styled.FooterButton>
@@ -34,6 +36,19 @@ export default function Footer() {
         <FaUser />
         <Styled.Label>Perfil</Styled.Label>
       </Styled.FooterButton>
+
+      {showModal && (
+        <Styled.ModalOverlay onClick={() => setShowModal(false)}>
+          <Styled.ModalContent onClick={(e) => e.stopPropagation()}>
+            <Styled.ModalOption onClick={() => { setShowModal(false); navigate("/inserir/transacoes"); }}>
+              Transação
+            </Styled.ModalOption>
+            <Styled.ModalOption onClick={() => { setShowModal(false); navigate("/inserir/categorias"); }}>
+              Categoria
+            </Styled.ModalOption>
+          </Styled.ModalContent>
+        </Styled.ModalOverlay>
+      )}
     </Styled.FooterContainer>
   );
 }
@@ -41,9 +56,9 @@ export default function Footer() {
 const Styled = {
   FooterContainer: styled.footer`
     position: fixed;
-    bottom: 0;
+    bottom: -1px;
     width: 100%;
-    height: 84px;
+    height: 85px;
     background-color: #1b1b1b;
     display: flex;
     justify-content: space-around;
@@ -75,5 +90,41 @@ const Styled = {
   Label: styled.span`
     font-size: 0.7rem;
     margin-top: 2px;
+  `,
+
+  ModalOverlay: styled.div`
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+
+  ModalContent: styled.div`
+    background: #2c2c2c;
+    padding: 24px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 240px;
+    color: white;
+  `,
+
+  ModalOption: styled.button`
+    background: #444;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #666;
+    }
   `,
 };
