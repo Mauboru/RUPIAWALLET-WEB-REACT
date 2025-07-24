@@ -7,27 +7,32 @@ import EditarCategoria from "../pages/EditarCategoria";
 import Dashboards from "../pages/Dashboards";
 import Perfil from "../pages/Perfil";
 import Buscar from "../pages/Buscar";
+import Login from "../pages/Login";
 import NotFound from "../pages/errors/NotFound";
 import NotAuthorized from "../pages/errors/NotAuthorized";
+import PrivateRoute from "./PrivateRoute";
 
 export default function AppRoutes() {
     return (
         <Router>
             <Routes>
                 {/* Login público */}
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
 
                 {/* Rota de erro */}
                 <Route path="/not-authorized" element={<NotAuthorized />} />
                 <Route path="*" element={<NotFound />} />
 
-                <Route path="/inserir/transacoes" element={<CreateTransaction />} />
-                <Route path="/inserir/categorias" element={<CreateCategorie />} />
-                <Route path="/editar-transacao/:id" element={<EditarTransacao />} />
+                <Route path="/inserir/transacoes" element={<PrivateRoute><CreateTransaction /></PrivateRoute>} />
+                <Route path="/inserir/categorias" element={<PrivateRoute><CreateCategorie /></PrivateRoute>} />
+                <Route path="/editar-transacao/:id" element={<PrivateRoute><EditarTransacao /></PrivateRoute>} />
                 <Route path="/editar-category/:id" element={<EditarCategoria />} />
-                <Route path="/dashboards" element={<Dashboards />} />
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/Buscar" element={<Buscar />} />
+                
+                <Route path="/dashboards" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
+                <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
+                <Route path="/Buscar" element={<PrivateRoute><Buscar /></PrivateRoute>} />
+
+                <Route path="/login" element={<Login />} />
             </Routes>
         </Router>
     );

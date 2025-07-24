@@ -19,7 +19,7 @@ export default function PrivateRoute({ children, requiredRole }) {
 
     const role = user?.role;
 
-    if (!token) return <Navigate to="/" replace />;
+    if (!token) return <Navigate to="/login" replace />;
 
     if (requiredRole && role !== requiredRole) {
         return <Navigate to="/not-authorized" replace />;
