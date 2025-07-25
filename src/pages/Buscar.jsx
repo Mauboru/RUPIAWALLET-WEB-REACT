@@ -101,11 +101,11 @@ export default function Buscar() {
   };
 
   const editCategory = (id) => {
-    navigate(`/editar-category/${id}`);
+    navigate(`/editar/categoria/${id}`);
   };
 
   const editTransaction = (id) => {
-    navigate(`/editar-transacao/${id}`);
+    navigate(`/editar/transacao/${id}`);
   }
 
   const clearFilters = () => {

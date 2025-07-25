@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import CreateTransaction from "../pages/transactions/Create";
 import CreateCategorie from "../pages/categories/Create";
-import EditarTransacao from "../pages/EditarTransacao";
-import EditarCategoria from "../pages/EditarCategoria";
+import UpdateTransaciton from "../pages/transactions/Update";
+import UpdateCategory from "../pages/categories/Update";
 import Dashboards from "../pages/Dashboards";
 import Perfil from "../pages/Perfil";
 import Buscar from "../pages/Buscar";
@@ -25,8 +25,8 @@ export default function AppRoutes() {
 
                 <Route path="/inserir/transacoes" element={<PrivateRoute><CreateTransaction /></PrivateRoute>} />
                 <Route path="/inserir/categorias" element={<PrivateRoute><CreateCategorie /></PrivateRoute>} />
-                <Route path="/editar-transacao/:id" element={<PrivateRoute><EditarTransacao /></PrivateRoute>} />
-                <Route path="/editar-category/:id" element={<EditarCategoria />} />
+                <Route path="/editar/transacao/:id" element={<PrivateRoute><UpdateTransaciton /></PrivateRoute>} />
+                <Route path="/editar/categoria/:id" element={<PrivateRoute><UpdateCategory /></PrivateRoute>} />
                 
                 <Route path="/dashboards" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
                 <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
+import MainLayout from "../../layouts/MainLayout";
 import styled from "styled-components";
-import { updateTransaction, getTransactionById } from '../services/transacao';
-import { getCategory } from '../services/category';
-import { CustomModal } from "../components";
+import { updateTransaction, getTransactionById } from '../../services/transacao';
+import { getCategory } from '../../services/category';
+import { CustomModal } from "../../components";
 import { useParams, useNavigate } from 'react-router-dom';
+import { FaEdit } from "react-icons/fa";
 
-export default function EditarTransacao() {
+export default function Update() {
   const [data, setData] = useState({
     tipo: "",
     categoriaId: "",
@@ -102,7 +103,6 @@ export default function EditarTransacao() {
         type: "success",
         message: response.data.message || "Transação atualizada com sucesso.",
       });
-      // if (onUpdated) onUpdated(); // This prop is removed as it's a standalone page
     } catch (error) {
       const mensagemErro = error?.response?.data?.message || "Erro ao conectar com o servidor.";
       setModal({
@@ -117,77 +117,87 @@ export default function EditarTransacao() {
 
   return (
     <MainLayout>
-      <Styled.Title>Editar Transação</Styled.Title>
-      <Styled.Form onSubmit={handleSubmit}>
+			<Styled.ScrollContainer>
+        <Styled.Title>
+          Transação <FaEdit style={{ marginLeft: 6, fontSize: "0.8rem" }} />
+        </Styled.Title>
+        <Styled.Form onSubmit={handleSubmit}>
 
-        <Styled.Input
-          name="data"
-          type="date"
-          value={data.data}
-          onChange={handleChange}
-          required
+          <Styled.Input
+            name="data"
+            type="date"
+            value={data.data}
+            onChange={handleChange}
+            required
+          />
+
+          <Styled.Select name="tipo" value={data.tipo} onChange={handleChange} required>
+            <option value="" disabled>Selecione o tipo</option>
+            <option value="ENTRADA">ENTRADA</option>
+            <option value="SAIDA">SAÍDA</option>
+          </Styled.Select>
+
+          <Styled.Select name="formaPagamento" value={data.formaPagamento} onChange={handleChange} required>
+            <option value="" disabled>Selecione a forma de pagamento</option>
+            <option value="DINHEIRO">DINHEIRO</option>
+            <option value="PIX">PIX</option>
+            <option value="CREDITO">CRÉDITO</option>
+            <option value="DEBITO">DÉBITO</option>
+          </Styled.Select>
+
+          <Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
+            <option value="">Selecione uma categoria</option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.nome}</option>
+            ))}
+          </Styled.Select>
+
+          <Styled.Input
+            name="descricao"
+            placeholder="Descrição"
+            value={data.descricao}
+            onChange={handleChange}
+            required
+          />
+
+          <Styled.Input
+            name="valor"
+            type="text"
+            placeholder="Valor"
+            value={data.valor}
+            onChange={handleCurrencyChange}
+            required
+          />
+
+          <Styled.Button type="submit" disabled={loading}>Salvar</Styled.Button>
+          <Styled.Button type="button" variant="secondary" onClick={() => navigate(-1)} disabled={loading}>
+            Cancelar
+          </Styled.Button>
+        </Styled.Form>
+
+        <CustomModal
+          show={modal.show}
+          type={modal.type}
+          message={modal.message}
+          onHide={() => setModal({ ...modal, show: false })}
         />
-
-        <Styled.Select name="tipo" value={data.tipo} onChange={handleChange} required>
-          <option value="" disabled>Selecione o tipo</option>
-          <option value="ENTRADA">ENTRADA</option>
-          <option value="SAIDA">SAÍDA</option>
-        </Styled.Select>
-
-        <Styled.Select name="formaPagamento" value={data.formaPagamento} onChange={handleChange} required>
-          <option value="" disabled>Selecione a forma de pagamento</option>
-          <option value="DINHEIRO">DINHEIRO</option>
-          <option value="PIX">PIX</option>
-          <option value="CREDITO">CRÉDITO</option>
-          <option value="DEBITO">DÉBITO</option>
-        </Styled.Select>
-
-        <Styled.Select name="categoriaId" value={data.categoriaId} onChange={handleChange} required>
-          <option value="">Selecione uma categoria</option>
-          {categorias.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.nome}</option>
-          ))}
-        </Styled.Select>
-
-        <Styled.Input
-          name="descricao"
-          placeholder="Descrição"
-          value={data.descricao}
-          onChange={handleChange}
-          required
-        />
-
-        <Styled.Input
-          name="valor"
-          type="text"
-          placeholder="Valor"
-          value={data.valor}
-          onChange={handleCurrencyChange}
-          required
-        />
-
-        <Styled.Button type="submit" disabled={loading}>Salvar</Styled.Button>
-        <Styled.Button type="button" onClick={() => navigate(-1)} disabled={loading} style={{ backgroundColor: '#999', marginTop: '8px' }}>
-          Cancelar
-        </Styled.Button>
-      </Styled.Form>
-
-      <CustomModal
-        show={modal.show}
-        type={modal.type}
-        message={modal.message}
-        onHide={() => setModal({ ...modal, show: false })}
-      />
+      </Styled.ScrollContainer>
     </MainLayout>
   );
 }
 
 const Styled = {
+  ScrollContainer: styled.div`
+    overflow-y: auto;
+    padding: 1rem;
+    margin-bottom: 3rem;
+  `,
+  
   Title: styled.h2`
     text-align: center;
     margin-bottom: 2rem;
+	  color: ${({ theme }) => theme.colors.text};
     font-size: 2rem;
-    color: #333;
   `,
 
   Form: styled.form`
@@ -214,7 +224,7 @@ const Styled = {
 
   Button: styled.button`
     padding: 0.9rem;
-    background-color: #007bff;
+    background-color: ${({ variant }) => variant === 'secondary' ? '#6c757d' : '#007bff'};
     color: white;
     border: none;
     font-size: 1rem;
@@ -222,12 +232,12 @@ const Styled = {
     cursor: pointer;
     transition: 0.3s;
 
-    &:hover:enabled {
-      background-color: #0056b3;
+    &:hover {
+      background-color: ${({ variant }) => variant === 'secondary' ? '#5a6268' : '#0056b3'};
     }
 
     &:disabled {
-      background-color: #ccc;
+      opacity: 0.6;
       cursor: not-allowed;
     }
   `,

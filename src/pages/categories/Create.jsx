@@ -97,12 +97,21 @@ export default function Create() {
 						required
 					/>
 						
-					<Styled.Input
-						type="file"
-						name="icone"
-						accept="image/*"
-						onChange={handleImageChange}
-					/>
+					<Styled.FileImageWrapper>
+						<Styled.Input
+							type="file"
+							name="icone"
+							accept="image/*"
+							onChange={handleImageChange}
+						/>
+
+						{data.icone && (
+							<Styled.ImagePreview
+								src={data.icone}
+								alt="Ícone da categoria"
+							/>
+						)}
+					</Styled.FileImageWrapper>
 
 					<Styled.FieldGroup>
 						<Styled.ColorInput
@@ -128,6 +137,12 @@ export default function Create() {
 }
 
 const Styled = {
+	FileImageWrapper: styled.div`
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	`,
+
 	ScrollContainer: styled.div`
 		overflow-y: auto;
 		padding: 1rem;
@@ -141,40 +156,40 @@ const Styled = {
 		width: 100%;
 	`,
 
-  Title: styled.h2`
-    text-align: center;
-    margin-bottom: 2rem;
-	color: ${({ theme }) => theme.colors.text};
-    font-size: 2rem;
-  `,
-	
-  Form: styled.form`
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-  `,
+	Title: styled.h2`
+		text-align: center;
+		margin-bottom: 2rem;
+		color: ${({ theme }) => theme.colors.text};
+		font-size: 2rem;
+	`,
+		
+	Form: styled.form`
+		display: flex;
+		flex-direction: column;
+		gap: 1.2rem;
+	`,
 
-  Select: styled.select`
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-  `,
+	Select: styled.select`
+		padding: 0.75rem;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		font-size: 1rem;
+	`,
 
-  Button: styled.button`
-    padding: 0.9rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
+	Button: styled.button`
+		padding: 0.9rem;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		font-size: 1rem;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: 0.3s;
 
-    &:hover {
-      background-color: #0056b3;
-    }
-  `,
+		&:hover {
+		background-color: #0056b3;
+		}
+	`,
 
 	Input: styled.input`
 		padding: 0.75rem;
@@ -214,5 +229,15 @@ const Styled = {
 			border: none;
 			border-radius: 8px;
 		}
+	`,
+
+	ImagePreview: styled.img`
+		max-width: 80px;
+		max-height: 80px;
+		object-fit: contain;
+		display: block;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 5px;
 	`,
 };
