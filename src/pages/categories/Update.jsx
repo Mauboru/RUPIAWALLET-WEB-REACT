@@ -11,13 +11,13 @@ export default function Update() {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, type: "info", message: "" });
   const { id } = useParams();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategory = async () => {
       setLoading(true);
       try {
-        const response = await getCategoryById(id); // Fetch category by ID
+        const response = await getCategoryById(id); 
         setData(response.data);
       } catch (error) {
         console.error(error);
@@ -30,7 +30,7 @@ export default function Update() {
         setLoading(false);
       }
     };
-    if (id) { // Only fetch if ID is available
+    if (id) {
       fetchCategory();
     }
   }, [id]);
@@ -74,7 +74,7 @@ export default function Update() {
     setLoading(true);
 
     try {
-      const response = await updateCategory(id, data); // Update category
+      const response = await updateCategory(id, data); 
       setModal({
         show: true,
         type: "success",
@@ -90,15 +90,6 @@ export default function Update() {
     } finally {
       setLoading(false);
     }
-    };
-    
-  const getImageSource = (iconData) => {
-    // Check if the iconData is a base64 string (starts with data:image/)
-    if (iconData && iconData.startsWith('data:image/')) {
-        return iconData;
-    }
-    // Otherwise, assume it's a URL path from the server
-    return iconData ? `${import.meta.env.VITE_BASE_URL}${iconData}` : '';
   };
 
   return (
@@ -130,10 +121,10 @@ export default function Update() {
 						/>
 
 						{data.icone && (
-							<Styled.ImagePreview
-								src={data.icone}
-								alt="Ícone da categoria"
-							/>
+              <Styled.ImagePreview
+                src={data.icone.startsWith("data:") ? data.icone : `${import.meta.env.VITE_BASE_URL}${data.icone}`}
+                alt="Ícone da categoria"
+              />
 						)}
 					</Styled.FileImageWrapper>
 
