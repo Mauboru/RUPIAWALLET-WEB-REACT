@@ -209,10 +209,13 @@ const Styled = {
   `,
 
   Input: styled.input`
+    width: 100%;
+    box-sizing: border-box;
     padding: 0.75rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
+    -webkit-appearance: none;
   `,
 
   Select: styled.select`

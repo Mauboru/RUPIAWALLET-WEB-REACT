@@ -133,10 +133,12 @@ export default function Buscar() {
             {/* filtros atuais de transações */}
             <div>
               <label>Mês:</label>
-              <input
+              <Styled.Input
+                name="data"
                 type="month"
                 value={monthFilter}
                 onChange={(e) => setMonthFilter(e.target.value)}
+                required
               />
             </div>
 
@@ -268,6 +270,16 @@ export default function Buscar() {
 }
 
 const Styled = {
+  Input: styled.input`
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    -webkit-appearance: none;
+  `,
+
   Title: styled.h2`
     margin: 24px 16px;
     font-size: 24px;
