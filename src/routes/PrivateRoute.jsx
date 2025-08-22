@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
 
-export default function PrivateRoute({ children, requiredRole }) {
+export default function PrivateRoute({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true); 
-    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const storedUser = localStorage.getItem("userData");
@@ -16,14 +14,6 @@ export default function PrivateRoute({ children, requiredRole }) {
     }, []);
 
     if (loading) return null;
-
-    const role = user?.role;
-
-    if (!token) return <Navigate to="/login" replace />;
-
-    if (requiredRole && role !== requiredRole) {
-        return <Navigate to="/not-authorized" replace />;
-    }
 
     return children;
 }
