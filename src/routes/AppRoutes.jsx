@@ -21,6 +21,7 @@ export default function AppRoutes() {
                 <Route path="/editar/categoria/:id" element={<PrivateRoute><UpdateCategory /></PrivateRoute>} />
                 
                 <Route path="/dashboards" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
+                <Route path="/" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
                 <Route path="/Buscar" element={<PrivateRoute><Buscar /></PrivateRoute>} />
             </Routes>
         </Router>
