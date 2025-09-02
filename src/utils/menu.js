@@ -1,4 +1,5 @@
 import { MdViewColumn, MdAdd, MdSearch, MdCategory, MdAttachMoney } from "react-icons/md";
+import { FaFileExcel } from "react-icons/fa";
 
 const menu = [
   {
@@ -21,6 +22,12 @@ const menu = [
     label: "Gráficos",
     path: "/dashboards",
     icon: MdViewColumn,
+    role: "",
+  },
+  {
+    label: "Excel",
+    path: "/excel",
+    icon: FaFileExcel,
     role: "",
   }
 ];

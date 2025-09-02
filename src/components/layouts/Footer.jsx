@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaSearch, FaPlusCircle, FaChartPie } from "react-icons/fa";
+import { FaSearch, FaPlusCircle, FaChartPie, FaFileExcel } from "react-icons/fa";
 import { useState } from "react";
 
 export default function Footer() {
@@ -25,6 +25,11 @@ export default function Footer() {
       <Styled.FooterButton onClick={() => navigate("/dashboards")} $active={isActive("/dashboards")}>
         <FaChartPie />
         <Styled.Label>Gráficos</Styled.Label>
+      </Styled.FooterButton>
+
+      <Styled.FooterButton onClick={() => navigate("/excel")} $active={isActive("/excel")}>
+        <FaFileExcel />
+        <Styled.Label>Excel</Styled.Label>
       </Styled.FooterButton>
 
       {showModal && (
