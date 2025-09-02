@@ -6,7 +6,7 @@ export default function Excel() {
     <MainLayout>
       <Styled.Container>
         <iframe
-          src="https://docs.google.com/spreadsheets/d/1-p7KbyGG-pLles6H1MB3mTqLKpiBDxQsLhs3uCHaymk/edit?usp=sharing"
+          src="https://docs.google.com/spreadsheets/d/1W2t3NUqJLS1Ci99n7wba0VdDOixzyfopVJzatOLrRQ8/edit?usp=sharing"
           frameBorder="0"
           width="100%"
           height="800"
