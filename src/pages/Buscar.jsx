@@ -73,6 +73,7 @@ export default function Buscar() {
     try {
       const response = await getCategory();
       setCategorias(response.data);
+      console.log(response)
     } catch (error) {
       console.error("Erro ao buscar categorias:", error);
     }
@@ -226,6 +227,8 @@ export default function Buscar() {
               <thead>
                 <tr>
                   <th>Nome</th>
+                  <th>Image</th>
+                  <th>Color</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -233,6 +236,20 @@ export default function Buscar() {
                 {categorias.map((c) => (
                   <tr key={c.id}>
                     <td>{c.nome}</td>
+                    <td>
+                      <Styled.ImagePreview
+                          src={c.icone.startsWith("data:") ? c.icone : `${import.meta.env.VITE_BASE_URL}${c.icone}`}
+                          alt="Ícone da categoria"
+                        />
+                    </td>
+                    <td>
+                      <Styled.ColorInput
+                        disabled={true}
+                        type="color"
+                        name="cor"
+                        value={c.cor}
+                      />
+                    </td>
                     <td>
                       <Styled.ActionButton onClick={() => editCategory(c.id)} title="Editar">
                         <FaEdit />
@@ -270,6 +287,36 @@ export default function Buscar() {
 }
 
 const Styled = {
+  ColorInput: styled.input`
+    appearance: none;
+    width: 100%;
+    height: 40px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0;
+    background-color: white;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+      border-radius: 8px;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 8px;
+    }
+  `,
+
+  ImagePreview: styled.img`
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: contain;
+    display: block;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 5px;
+  `,
+
   Input: styled.input`
     width: 100%;
     box-sizing: border-box;
