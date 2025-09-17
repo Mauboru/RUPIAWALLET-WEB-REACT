@@ -17,7 +17,7 @@ export default function Sidebar({ isOpen, onClose }) {
     
     if (userData) {
       const user = JSON.parse(userData);
-      const role = user.user.role;
+      const role = user.role || "";
       const filteredMenu = getMenuByRole(role);
       setMenuItems(filteredMenu);
 

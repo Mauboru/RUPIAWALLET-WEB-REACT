@@ -252,16 +252,18 @@ const Styled = {
   `,
 
   ResumoContainer: styled.div`
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 4rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 4rem;
+      grid-auto-rows: min-content;
+      align-items: start; // Adicione esta linha
 
-    @media(min-width: 480px) {
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
-  `,
-
+      @media(min-width: 480px) {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+    `,
+  
   ResumoCard: styled.div`
     background: #fff;
     border-radius: 12px;
@@ -305,6 +307,8 @@ const Styled = {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-height: 180px; /* Ajuste este valor conforme sua necessidade */
 
     img {
       width: 36px;
