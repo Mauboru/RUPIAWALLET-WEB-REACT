@@ -4,6 +4,7 @@ import CreateCategorie from "../pages/categories/Create";
 import UpdateTransaciton from "../pages/transactions/Update";
 import UpdateCategory from "../pages/categories/Update";
 import Dashboards from "../pages/Dashboards";
+import Home from "../pages/Home";
 import Buscar from "../pages/Buscar";
 import Excel from "../pages/Excel";
 import NotFound from "../pages/NotFound";
@@ -23,7 +24,7 @@ export default function AppRoutes() {
                 
                 <Route path="/dashboards" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
                 <Route path="/excel" element={<PrivateRoute><Excel /></PrivateRoute>} />
-                <Route path="/" element={<PrivateRoute><Dashboards /></PrivateRoute>} />
+                <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
                 <Route path="/Buscar" element={<PrivateRoute><Buscar /></PrivateRoute>} />
             </Routes>
         </Router>
